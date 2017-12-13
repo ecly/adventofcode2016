@@ -36,5 +36,6 @@ def distance(directions):
 
 file = open('input.in', 'r')
 directions = parse(file)
+file.close()
 print(distance(directions))
 print(first_duplicate(directions))
