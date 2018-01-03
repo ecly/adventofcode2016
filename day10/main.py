@@ -13,18 +13,18 @@ def runCommand(number, bots, output):
             print(number)
 
         if ltype == 'output':
-            output[lid].append(lc)
+            output[lid] = lc
         else:
             bots[lid][1].append(lc)
             lo_res = runCommand(lid, bots, output)
         if htype == 'output':
-            output[hid].append(hc)
+            output[hid] = hc
         else:
             bots[hid][1].append(hc)
             hi_res = runCommand(hid, bots, output)
 
 def main(lines):
-    output = defaultdict(list)
+    output = {}
     bots = defaultdict(lambda: [None, []])
     for line in lines:
         if line.startswith('value'):
@@ -41,4 +41,5 @@ def main(lines):
 with open('input.in', 'r') as f:
     lines = sorted(f.readlines())[::-1]
 
-print(main(lines))
+res = main(lines)
+print(res['0']*res['1']*res['2'])
