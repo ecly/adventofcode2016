@@ -1,4 +1,4 @@
-from math import sqrt; from itertools import count, islice
+from itertools import count
 
 def get_val(regs, val):
     if val.isalpha():
@@ -7,8 +7,7 @@ def get_val(regs, val):
         return int(val)
 
 # basically copy of day 18
-def first(instructions):
-    regs = dict(zip('abcd', [0]*4))
+def exec(instructions, regs):
     i = 0
     while 0 <= i < len(instructions):
         instr = instructions[i].split()
@@ -30,4 +29,7 @@ def first(instructions):
 
 with open('input.in') as f:
     instructions = f.read().splitlines()
-    print(first(instructions))
+    regs1 = dict(zip('abcd', [0]*4))
+    print(exec(instructions, regs1))
+    regs2 = dict(zip('abcd', [0,0,1,0]))
+    print(exec(instructions, regs2))
