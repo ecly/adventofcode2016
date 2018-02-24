@@ -1,26 +1,32 @@
 import Data.Bits
+import Data.List
 
-data Entry = Wall | Open
-    deriving (Show)
+type Coord = (Int, Int)
 
-input :: Integer
-input = 10
-
-gridSize :: Integer
-gridSize = 9
+input :: Int
+input = 1362
 
 main :: IO ()
-main = do
-    let graph = [genGraphRow y | y <- [0..gridSize]]
-    print graph
+main = print $ bfs [] (31, 39) [(1, 1)] 0
 
-genGraphRow :: Integer -> [Entry]
-genGraphRow y =
-    let entryForCoord x' y' =
-          if isValidCoord x' y'
-             then Open
-             else Wall
-    in [entryForCoord x y | x <- [0..gridSize]]
+isValidCoord :: Coord -> Bool
+isValidCoord (x,y) = even (popCount (x*x + 3*x + 2*x*y + y + y*y + input))
 
-isValidCoord :: Integer -> Integer -> Bool
-isValidCoord x y = even (popCount (x*x + 3*x + 2*x*y + y + y*y + input))
+nodes :: Coord -> [Coord]
+nodes (0,0) = [(0,1), (1,1)]
+nodes (1,0) = [(0,0), (1,1), (2,0)]
+nodes (0,1) = [(0,0), (1,1), (0,2)]
+nodes (x,y) = [(x+1,y), (x-1,y), (x,y-1), (x,y+1)]
+
+neighbours :: Coord -> [Coord]
+neighbours (x, y) =
+    filter isValidCoord $ nodes (x,y)
+
+bfs :: [Coord] -> Coord -> [Coord] -> Int -> Int
+bfs _seen _target [] _dist = -1
+bfs seen target frontier dist
+  | target `elem` frontier = dist
+  | otherwise = bfs (seen ++ frontier) target newFrontier dist+1
+    where
+        localNeighbours = frontier >>= neighbours
+        newFrontier = filter (`notElem` seen) (nub localNeighbours)
