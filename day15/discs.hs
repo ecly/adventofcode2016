@@ -5,7 +5,8 @@ main :: IO()
 main = do
     let discs = [(11, 13, 1), (0, 5, 2), (11, 17, 3),
                  (0,   3, 4), (2, 7, 5), (17, 19, 6)]
-    print (solve discs 0)
+    print $ solve discs 0
+    print $ solve (discs ++ [(0, 11, 7)]) 0
 
 solve :: [Disc] -> Integer -> Integer
 solve discs time =
