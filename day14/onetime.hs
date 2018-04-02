@@ -12,7 +12,7 @@ main = do
     print $ solve 1
     -- second solve takes a couple of minutes as the
     -- hash function in pureMD5 is somewhat slow
-    print $ maybe 0 . solve 2017
+    print $ solve 2017
 
 solve :: Int -> Maybe Int
 solve n =
