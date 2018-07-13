@@ -4,12 +4,12 @@ type Coord = (Int, Int)
 data Node = Node { coords :: Coord
           , size :: Int
           , used :: Int
-          , available :: Int } deriving (Show)
+          , available :: Int } deriving (Show, Eq)
 
 main :: IO()
 main = do
     input <- parse <$> getContents
-    print (take 5 input)
+    print (solve input)
 
 
 parse :: String -> [Node]
@@ -33,3 +33,11 @@ lineToNode line = Node coords_ size_ used_ available_
           coords_ = coordFromFileSystem fs
           (size_:used_:available_:_) = map (read . init) (init rest)
 
+validPair :: Node -> Node -> Bool
+validPair n1 n2 = notEmpty && notSame && fits
+    where notEmpty = used n1 /= 0
+          notSame = coords n1 /= coords n2
+          fits = used n1 < available n2
+
+solve :: [Node] -> Int
+solve input = sum $ map (\n -> length $ filter (validPair n) input) input
