@@ -48,4 +48,7 @@ def exec(instructions, regs):
 with open('input.in') as f:
     instructions = f.read().splitlines()
     regs1 = dict(zip('abcd', [7,0,0,0]))
-    print(exec(instructions, regs1))
+    print(exec(instructions.copy(), regs1))
+    # 5 minutes with pypy3 - no optimizations needed :-)
+    regs2 = dict(zip('abcd', [12,0,0,0]))
+    print(exec(instructions, regs2))
