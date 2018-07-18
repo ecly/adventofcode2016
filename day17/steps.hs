@@ -1,47 +1,47 @@
+import Data.Char
+import Data.Set ( Set )
+import Data.Digest.Pure.MD5
+import qualified Data.Set as Set
 import qualified Data.ByteString.Lazy as LB
 import qualified Data.ByteString.Lazy.Char8 as C8
-import Data.Digest.Pure.MD5
-import Data.List
-import Data.Maybe
-import Data.Char
 
-type Coord = (Int, Int)
+type State = (Int, Int, String)
 
 _input :: String
 _input = "vkjiggvb"
 
 main :: IO()
-main = print $ solve _input
-
-solve :: String -> String
-solve s =
-    let path = bfs [] (3, 3) [(0, 0)] _input
-     in zipWith letterFromMove path (tail path)
+main = do
+    let paths = [path | (3,3,path) <- bfs (0,0, _input)]
+    print (head paths)
+    -- kills pc
+    -- print (length $ last paths)
 
 md5Hash :: String  -> String
 md5Hash = show . md5 . C8.pack
 
-letterFromMove :: Coord -> Coord -> Char
-letterFromMove (x1, y1) (x2, y2) =
-  let dx = x1 - x2
-      dy = y1 - y2
-   in case (dx, dy) of
-        (1,  _) -> 'R'
-        (-1, _) -> 'L'
-        (_,  1) -> 'D'
-        (_, -1) -> 'U'
-
 isOpen :: Char -> Bool
-isOpen x
-  | x == 'a'= True
-  | otherwise = isAlpha x
+isOpen x = x `elem` "bcdef"
 
-isValidCoord :: Coord -> Bool
-isValidCoord (x, y) = x >= 0 && y >= 0 && x < 4 && y < 4
+isValidState :: State -> Bool
+isValidState (x, y, _) = x >= 0 && y >= 0 && x < 4 && y < 4
 
-neighbours :: Coord -> String -> [Coord]
-neighbours (x, y) i =
+neighbours :: State -> [State]
+neighbours (x, y, i) =
     let hash = md5Hash i
-        moves = [(x, y-1), (x, y+1), (x-1, y), (x+1, y)]
+        up = (x, y-1, i ++ "U")
+        down = (x, y+1, i ++ "D")
+        left = (x-1, y, i ++ "L")
+        right = (x+1, y, i ++ "R")
+        moves = [up, down, left, right]
         candidates = zip (map isOpen (take 4 hash)) moves
-     in map snd (filter (\(open, c) -> isValidCoord c && open) candidates)
+     in map snd (filter (\(open, c) -> isValidState c && open) candidates)
+
+bfs :: State -> [State]
+bfs initial = aux Set.empty [initial] []
+  where
+    aux _    [] [] = []
+    aux seen [] ys = aux seen (reverse ys) []
+    aux seen (x:xs) ys
+      | Set.member x seen = aux seen xs ys
+      | otherwise = x : aux (Set.insert x seen) xs (neighbours x ++ ys)
