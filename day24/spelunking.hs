@@ -9,7 +9,9 @@ type Coord = (Int, Int)
 main :: IO()
 main = do
     graph <- parse <$> getContents
-    print (solve1 graph)
+    let (first, second) = solve graph
+    print first
+    print second
 
 parse :: String -> Map Coord Char
 parse input =
@@ -29,14 +31,18 @@ calcAllDists graph =
         allPairs = pairs digitCoords
      in foldl (\acc -> \(f,t) -> let d = bfs graph f t in insertBoth (f,t) d acc) Map.empty allPairs
 
-solve1 :: Map Coord Char -> Int
-solve1 graph =
+solve :: Map Coord Char -> (Int, Int)
+solve graph =
     let numbers = (Map.toList . Map.filter isDigit) graph
         zero = head $ filter ((=='0') . snd) numbers
         tailPerms = permutations $ map fst (numbers \\ [zero])
-        perms = map (fst zero:) tailPerms
+        perms1 = map (fst zero:) tailPerms
+        perms2 = map (++[fst zero]) perms1
         allDists = calcAllDists graph
-     in minimum $ map (pathDist allDists) perms
+        first = minimum $ map (pathDist allDists) perms1
+        second = minimum $ map (pathDist allDists) perms2
+    in (first, second)
+
 
 pathDist :: Map (Coord, Coord) Int -> [Coord] -> Int
 pathDist dists numbers =
